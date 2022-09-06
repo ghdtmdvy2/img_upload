@@ -20,16 +20,21 @@ public class MemberService {
     private final MemberRepository memberRepository;
 
     public void create(String id, String email, String pwd, MultipartFile img1) {
+        String profileImgRelPath = "member/" + UUID.randomUUID().toString() + ".png";
+        File profileImgFile = new File(genFileDirPath + "/" + profileImgRelPath);
+
+        profileImgFile.mkdirs();
+        try {
+            img1.transferTo(profileImgFile);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         Member member = Member.builder()
                 .username(id)
                 .email(email)
                 .password(pwd)
+                .profileImg(profileImgRelPath)
                 .build();
-        try {
-            img1.transferTo(new File(genFileDirPath + "/" + UUID.randomUUID().toString() +".png"));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
         memberRepository.save(member);
     }
 
